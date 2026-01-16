@@ -78,6 +78,7 @@ export const getSignIn=async(req:Request,res:Response)=>{
             _id:checkUser._id,
             name:checkUser.name,
             gmail:checkUser.gmail,
+            role:checkUser.role,
         },
         message:"Login Successfully",
     });
