@@ -5,5 +5,6 @@ gmail:String,
 password:String,
 otp:Number,
 otpExpire:Number,
+role:String,
 })
 export const userModel=mongoose.model("user",userSchema);

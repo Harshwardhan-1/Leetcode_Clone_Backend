@@ -30,8 +30,9 @@ bcrypt.genSalt(12, function(err, salt) {
     name,
     gmail,
     password:hash,
+    role:"STUDENT",
 });
-let token=jwt.sign({gmail:gmail,userId:newUser._id},process.env.JWT_SECRET!);
+let token=jwt.sign({name:name,gmail:gmail,userId:newUser._id,role:newUser.role},process.env.JWT_SECRET!);
 res.cookie("token",token,{
     httpOnly:true,
     secure:true,
@@ -65,7 +66,7 @@ export const getSignIn=async(req:Request,res:Response)=>{
             message:"Password is incorrect",
         });
     }
-    let token=jwt.sign({gmail:gmail,userId:checkUser._id},process.env.JWT_SECRET!);
+    let token=jwt.sign({name:checkUser.name,gmail:gmail,userId:checkUser._id,role:checkUser.role},process.env.JWT_SECRET!);
     res.cookie("token",token,{
         httpOnly:true,
         secure:true,
@@ -204,4 +205,28 @@ export const changePassword=async(req:Request,res:Response)=>{
             gmail:checkUser.gmail,
         }
     });
+}
+
+
+
+
+
+export const adminPage=async(req:Request,res:Response)=>{
+    const {gmail}=req.body;
+    if(!gmail){
+        return res.status(401).json({
+            messgae:"please provide gmail",
+        });
+    }
+    const checkIt=await userModel.findOne({gmail});
+    if(!checkIt){
+        return res.status(401).json({
+            message:"user not found",
+        });
+    }
+    if(checkIt.role=== 'ADMIN'){
+        return res.status(200).json({
+            message:"admin found",
+        });
+    }
 }
