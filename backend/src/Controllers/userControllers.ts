@@ -239,12 +239,12 @@ export const adminPage=async(req:Request,res:Response)=>{
 
 export const particularUser=async(req:Request,res:Response)=>{
     const user=(req as any).user;
-    const gmail=user.gmail;
     if(!user){
         return res.status(401).json({
             message:"student not found",
         });
     }
+    const gmail=user.gmail;
 const findIt=await userModel.findOne({gmail});
 if(!findIt){
     return res.status(401).json({
