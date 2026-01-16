@@ -22,11 +22,11 @@ const questionSchema=new mongoose.Schema({
         required:true,
     },
     sampleInput:{
-        type:Array,
+        type:mongoose.Schema.Types.Mixed,
         required:true,
     },
     sampleOutput:{
-        type:Array,
+        type:mongoose.Schema.Types.Mixed,
         required:true,
     },
     difficulty:{

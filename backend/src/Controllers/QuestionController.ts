@@ -29,7 +29,7 @@ const output=JSON.parse(sampleOutput);
 const user=(req as any).user;
 const userId=user.userId;
 const makeQuestion=await questionModel.create({
-    userId,
+    userId:userId,
     title,
     description,
     functionSignature,
