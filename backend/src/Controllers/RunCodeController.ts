@@ -17,13 +17,24 @@ if(!problem){
 const input=problem.sampleInput;
 const output=await executeCode(language,userCode,JSON.stringify(input));
 
-const yourOutput=output.trim();
-const sampleOutput=String(problem.sampleOutput).trim();
+let yourOutputParsed;
+let sampleOutputParsed;
+try {
+  yourOutputParsed = JSON.parse(output.trim());
+  sampleOutputParsed = problem.sampleOutput;
+} catch {
+  yourOutputParsed = output.trim();
+  sampleOutputParsed = String(problem.sampleOutput).trim();
+}
+const isAccepted =
+  JSON.stringify(yourOutputParsed) ===
+  JSON.stringify(sampleOutputParsed);
+
 res.json({
     sampleInput: input,
     sampleOutput: problem.sampleOutput,
-    yourOutput: yourOutput,
-    status:yourOutput===sampleOutput?"Accepted":"Wrong Answer",
+    yourOutput: yourOutputParsed,
+    status:isAccepted ?"Accepted":"Wrong Answer",
 });
 
 }
