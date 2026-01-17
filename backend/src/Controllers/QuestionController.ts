@@ -44,3 +44,15 @@ return res.status(200).json({
     data:makeQuestion,
 });
 }
+
+
+
+
+
+export const showQuestion=async(req:Request,res:Response)=>{
+    const showQuestion=await questionModel.find();
+    return res.status(200).json({
+        message:"all Question",
+        data:showQuestion,
+    });
+}
