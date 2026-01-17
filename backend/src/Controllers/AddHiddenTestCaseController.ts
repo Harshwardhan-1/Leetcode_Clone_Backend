@@ -8,7 +8,9 @@ if(!title || !sampleInput || !sampleOutput){
         message:"provide proper details",
     });
 }
-const findIt=await hiddenModel.findOne({title,sampleInput,sampleOutput});
+const inputStr=JSON.stringify(JSON.parse(sampleInput));
+const outputStr=JSON.stringify(JSON.parse(sampleOutput));
+const findIt=await hiddenModel.findOne({title,sampleInput:inputStr,sampleOutput:outputStr});
 if(findIt){
     return res.status(401).json({
         message:"already same input and output exist add diffrent one",
@@ -16,13 +18,11 @@ if(findIt){
 }
 const user=(req as any).user;
 const userId=user.userId;
-const input=JSON.parse(sampleInput);
-const output=JSON.parse(sampleOutput);
 const createIt=await hiddenModel.create({
 userId:userId,
 title,
-sampleInput:input,
-sampleOutput:output,
+sampleInput:inputStr,
+sampleOutput:outputStr,
 });
 return res.status(200).json({
     message:"successfully created hidden test case",
