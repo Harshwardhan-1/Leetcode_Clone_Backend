@@ -66,7 +66,7 @@ export const particularQuestion=async(req:Request,res:Response)=>{
             message:"provide proper detail",
         });
     }
-    const checkIt=await questionModel.findOne({id});
+    const checkIt=await questionModel.findById(id);
     if(!checkIt){
         return res.status(403).json({
             message:"not found",
