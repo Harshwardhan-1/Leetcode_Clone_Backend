@@ -56,3 +56,24 @@ export const showQuestion=async(req:Request,res:Response)=>{
         data:showQuestion,
     });
 }
+
+
+
+export const particularQuestion=async(req:Request,res:Response)=>{
+    const {id}=req.body;
+    if(!id){
+        return res.status(401).json({
+            message:"provide proper detail",
+        });
+    }
+    const checkIt=await questionModel.findOne({id});
+    if(!checkIt){
+        return res.status(403).json({
+            message:"not found",
+        });
+    }
+    return res.status(200).json({
+        message:"got particular problem",
+        data:checkIt,
+    });
+}
