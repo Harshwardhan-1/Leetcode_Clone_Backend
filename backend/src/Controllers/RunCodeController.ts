@@ -22,7 +22,7 @@ const sampleOutput=String(problem.sampleOutput).trim();
 res.json({
     sampleInput: input,
     sampleOutput: problem.sampleOutput,
-    yourOutput: output,
+    yourOutput: yourOutput,
     status:yourOutput===sampleOutput?"Accepted":"Wrong Answer",
 });
 
