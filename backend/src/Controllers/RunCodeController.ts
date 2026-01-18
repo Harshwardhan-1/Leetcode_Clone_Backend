@@ -27,31 +27,49 @@ const allTestCases=[
 let allPassed=true;
 const results:any[]=[];
 
-for(let testcase of allTestCases){
-    let inputStr=Array.isArray(testcase.input)?testcase.input.join("\n"):testcase.input;
-    if(typeof inputStr === 'string' && inputStr.startsWith('[')) {
-    inputStr = inputStr.replace(/[\[\]\s]/g, '').split(',').join('\n');
-}
+for (let testcase of allTestCases) {
+    // Convert input to string
+    let inputStr = '';
 
-    
-try {
-const output=await executeCode(language,userCode,inputStr);
-const isAccepted=output.trim()===String(testcase.expectedOutput).trim();
-if(!isAccepted) allPassed=false;
-  results.push({
-    input: testcase.input,
-      expectedOutput: testcase.expectedOutput,
-      yourOutput:output.trim(),
-      status: isAccepted ? "Accepted" : "Wrong Answer"
-  });
-}catch(err){
-    allPassed=false;results.push({
-        input: testcase.input,
-        yourOutput: "Error",
-        expectedOutput: testcase.expectedOutput,
-        status: "Runtime Error",
-      });
-}
+    // Agar array format me aaya
+    if (Array.isArray(testcase.input)) {
+        inputStr = testcase.input.join('\n');
+    } else if (typeof testcase.input === 'string') {
+        // Agar string me brackets hai "[1,2,3,4]"
+        if (testcase.input.startsWith('[')) {
+            inputStr = testcase.input
+                .replace(/[\[\]\s]/g, '') // remove brackets and spaces
+                .split(',')
+                .join('\n'); // convert to line by line
+        } else {
+            inputStr = testcase.input;
+        }
+    }
+
+    try {
+        const output = await executeCode(language, userCode, inputStr);
+
+        const expected = String(testcase.expectedOutput).trim();
+        const actual = output.trim();
+
+        const isAccepted = actual === expected;
+        if (!isAccepted) allPassed = false;
+
+        results.push({
+            input: testcase.input,
+            expectedOutput: testcase.expectedOutput,
+            yourOutput: actual,
+            status: isAccepted ? 'Accepted' : 'Wrong Answer',
+        });
+    } catch (err) {
+        allPassed = false;
+        results.push({
+            input: testcase.input,
+            expectedOutput: testcase.expectedOutput,
+            yourOutput: 'Error',
+            status: 'Runtime Error',
+        });
+    }
 }
 res.json({
     status:allPassed?"Accepted":"Wrong Answer",

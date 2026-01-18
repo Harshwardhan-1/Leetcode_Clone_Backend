@@ -25,7 +25,7 @@ return new Promise((resolve,reject)=>{
         fs.writeFileSync(filePath,userCode);
         
       const outputPath = path.join(tempDir, "code.exe");
-        command = `g++ ${filePath} -o ${outputPath} && echo ${input} | ${outputPath}`;
+command = `g++ "${filePath}" -o "${outputPath}" && echo "${input.replace(/"/g, '\\"')}" | "${outputPath}"`;        
     }
     exec(command, (err, stdout, stderr) => {
       if (err) return reject(stderr);
