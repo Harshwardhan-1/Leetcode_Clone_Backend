@@ -18,7 +18,7 @@ return new Promise((resolve,reject)=>{
    else if(language=== 'Python'){
         filePath=path.join(tempDir,"code.py");
         fs.writeFileSync(filePath,userCode);
-        command=`python ${filePath}`;
+        command = `echo '${input}' | python ${filePath}`;
     }
    else if(language=== 'C++'){
         filePath=path.join(tempDir,"code.cpp");

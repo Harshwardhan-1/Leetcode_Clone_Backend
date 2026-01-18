@@ -1,9 +1,11 @@
 import {Request,Response} from 'express';
 import { questionModel } from '../models/QuestionModel';
 import { executeCode } from '../utils/executeCode';
+import { hiddenModel } from '../models/HiddenTestCaseModel';
+import { encodeXText } from 'nodemailer/lib/shared';
 export const runCode=async(req:Request,res:Response)=>{
-const {id,language,userCode}=req.body;
-if(!id || !language || !userCode){
+const {id,language,userCode,title}=req.body; 
+if(!id || !language || !userCode || !title){
     return res.status(401).json({
         message:"somehting went wrong",
     });
@@ -14,27 +16,40 @@ if(!problem){
         message:"cannot by id",
     });
 }
-const input=problem.sampleInput;
-const output=await executeCode(language,userCode,JSON.stringify(input));
+const hiddenTestCase=await hiddenModel.find({title});
+const allTestCases=[
+    {input:problem.sampleInput,expectedOutput:problem.sampleOutput},
+    ...hiddenTestCase.map(tc=>({
+        input:tc.sampleInput,
+        expectedOutput:tc.sampleOutput,
+    }))
+];
+let allPassed=true;
+const results:any[]=[];
 
-let yourOutputParsed;
-let sampleOutputParsed;
+for(let testcase of allTestCases){
+    const inputStr=Array.isArray(testcase.input)?testcase.input.join("\n"):testcase.input;
 try {
-  yourOutputParsed = JSON.parse(output.trim());
-  sampleOutputParsed = problem.sampleOutput;
-} catch {
-  yourOutputParsed = output.trim();
-  sampleOutputParsed = String(problem.sampleOutput).trim();
+const output=await executeCode(language,userCode,inputStr);
+const isAccepted=output.trim()===String(testcase.expectedOutput).trim();
+if(!isAccepted) allPassed=false;
+  results.push({
+    input: testcase.input,
+      expectedOutput: testcase.expectedOutput,
+      yourOutput:output.trim(),
+      status: isAccepted ? "Accepted" : "Wrong Answer"
+  });
+}catch(err){
+    allPassed=false;results.push({
+        input: testcase.input,
+        yourOutput: "Error",
+        expectedOutput: testcase.expectedOutput,
+        status: "Runtime Error",
+      });
 }
-const isAccepted =
-  JSON.stringify(yourOutputParsed) ===
-  JSON.stringify(sampleOutputParsed);
-
+}
 res.json({
-    sampleInput: input,
-    sampleOutput: problem.sampleOutput,
-    yourOutput: yourOutputParsed,
-    status:isAccepted ?"Accepted":"Wrong Answer",
+    status:allPassed?"Accepted":"Wrong Answer",
+    results
 });
-
 }
