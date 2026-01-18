@@ -8,8 +8,8 @@ if(!title || !sampleInput || !sampleOutput){
         message:"provide proper details",
     });
 }
-const inputStr=JSON.stringify(JSON.parse(sampleInput));
-const outputStr=JSON.stringify(JSON.parse(sampleOutput));
+const inputStr=sampleInput.trim();
+const outputStr=sampleOutput.trim();
 const findIt=await hiddenModel.findOne({title,sampleInput:inputStr,sampleOutput:outputStr});
 if(findIt){
     return res.status(401).json({

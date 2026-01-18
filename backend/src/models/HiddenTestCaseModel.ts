@@ -11,11 +11,11 @@ const hiddenTestSchema=new mongoose.Schema({
         required:true,
     },
     sampleInput:{
-        type:mongoose.Schema.Types.Mixed,
+        type:String,
         required:true,
     },
     sampleOutput:{
-        type:mongoose.Schema.Types.Mixed,
+        type:String,
         required:true,
     },
 })

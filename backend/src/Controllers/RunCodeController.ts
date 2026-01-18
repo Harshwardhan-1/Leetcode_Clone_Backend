@@ -1,78 +1,37 @@
 import {Request,Response} from 'express';
-import { questionModel } from '../models/QuestionModel';
-import { executeCode } from '../utils/executeCode';
 import { hiddenModel } from '../models/HiddenTestCaseModel';
-import { encodeXText } from 'nodemailer/lib/shared';
-export const runCode=async(req:Request,res:Response)=>{
-const {id,language,userCode,title}=req.body; 
-if(!id || !language || !userCode || !title){
+import { executeCode } from '../utils/executeCode';
+export const runUserCode=async(req:Request,res:Response)=>{
+const {id,title,language,userCode}=req.body;
+if(!id || !title || !language || !userCode){
     return res.status(401).json({
-        message:"somehting went wrong",
+        message:"provide proper detail",
     });
 }
-const problem=await questionModel.findById(id);
-if(!problem){
-    return res.status(401).json({
-        message:"cannot by id",
+const hiddenTests=await hiddenModel.find({title});
+if(hiddenTests.length=== 0){
+    return res.status(400).json({
+    message:"admin has not completely make the question and added does not hidden test case for it",
     });
 }
-const hiddenTestCase=await hiddenModel.find({title});
-const allTestCases=[
-    {input:problem.sampleInput,expectedOutput:problem.sampleOutput},
-    ...hiddenTestCase.map(tc=>({
-        input:tc.sampleInput,
-        expectedOutput:tc.sampleOutput,
-    }))
-];
 let allPassed=true;
-const results:any[]=[];
+const testCaseResult:any[]=[];
+for(let i=0;i<hiddenTests.length;i++){
+    const input=String(hiddenTests[i].sampleInput).trim();
+const expected=String(hiddenTests[i].sampleOutput).trim();
+const output=await executeCode(language,userCode,input);
 
-for (let testcase of allTestCases) {
-    // Convert input to string
-    let inputStr = '';
-
-    // Agar array format me aaya
-    if (Array.isArray(testcase.input)) {
-        inputStr = testcase.input.join('\n');
-    } else if (typeof testcase.input === 'string') {
-        // Agar string me brackets hai "[1,2,3,4]"
-        if (testcase.input.startsWith('[')) {
-            inputStr = testcase.input
-                .replace(/[\[\]\s]/g, '') // remove brackets and spaces
-                .split(',')
-                .join('\n'); // convert to line by line
-        } else {
-            inputStr = testcase.input;
-        }
-    }
-
-    try {
-        const output = await executeCode(language, userCode, inputStr);
-
-        const expected = String(testcase.expectedOutput).trim();
-        const actual = output.trim();
-
-        const isAccepted = actual === expected;
-        if (!isAccepted) allPassed = false;
-
-        results.push({
-            input: testcase.input,
-            expectedOutput: testcase.expectedOutput,
-            yourOutput: actual,
-            status: isAccepted ? 'Accepted' : 'Wrong Answer',
-        });
-    } catch (err) {
-        allPassed = false;
-        results.push({
-            input: testcase.input,
-            expectedOutput: testcase.expectedOutput,
-            yourOutput: 'Error',
-            status: 'Runtime Error',
-        });
-    }
+const passed=output.trim()===expected;
+if(!passed)allPassed=false;
+testCaseResult.push({
+    input,
+    expectedOutput:expected,
+    userOutput:output,
+    status:passed?"Passed":"Failed",
+})
 }
-res.json({
-    status:allPassed?"Accepted":"Wrong Answer",
-    results
+return res.status(200).json({
+    message:allPassed?"all test case passed":"Some test cases failed",
+    data:testCaseResult,
 });
 }
