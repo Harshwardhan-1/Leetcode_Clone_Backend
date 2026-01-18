@@ -28,7 +28,12 @@ let allPassed=true;
 const results:any[]=[];
 
 for(let testcase of allTestCases){
-    const inputStr=Array.isArray(testcase.input)?testcase.input.join("\n"):testcase.input;
+    let inputStr=Array.isArray(testcase.input)?testcase.input.join("\n"):testcase.input;
+    if(typeof inputStr === 'string' && inputStr.startsWith('[')) {
+    inputStr = inputStr.replace(/[\[\]\s]/g, '').split(',').join('\n');
+}
+
+    
 try {
 const output=await executeCode(language,userCode,inputStr);
 const isAccepted=output.trim()===String(testcase.expectedOutput).trim();
