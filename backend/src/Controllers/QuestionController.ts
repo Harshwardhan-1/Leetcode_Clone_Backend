@@ -24,8 +24,8 @@ if(checkIt){
         message:"already have same question",
     });
 }
-const input=JSON.parse(sampleInput);
-const output=JSON.parse(sampleOutput);
+const input=sampleInput;
+const output=sampleOutput;
 const user=(req as any).user;
 const userId=user.userId;
 const makeQuestion=await questionModel.create({
@@ -34,8 +34,8 @@ const makeQuestion=await questionModel.create({
     description,
     functionSignature,
     constraint,
-    sampleInput:input,
-    sampleOutput:output,
+    sampleInput,
+    sampleOutput,
     difficulty,
     topic,
 });
@@ -44,10 +44,6 @@ return res.status(200).json({
     data:makeQuestion,
 });
 }
-
-
-
-
 
 export const showQuestion=async(req:Request,res:Response)=>{
     const showQuestion=await questionModel.find();
