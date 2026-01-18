@@ -16,9 +16,9 @@ app.use(cors({
 })); 
 import userRouter from "./Routes/userRoutes";
 import addQuestion from "./Routes/QuestionRoutes";
-import submitUserSolution from "./Routes/SubmissionModel";
 import hiddentestRoutes from "./Routes/hiddenTestCaseRoutes";
 import runCodeRoutes from "./Routes/RunCodeRoutes";
+import submissionRoutes from "./Routes/SubmissionRoutes";
 app.get("/",(req : Request,res:Response)=>{
   res.send("hii harsh here")
 })
@@ -29,9 +29,9 @@ mongoose.connect(process.env.MONGO_URL!)
 
 app.use("/api/all",userRouter);
 app.use('/api/question',addQuestion);
-app.use('/api/submit',submitUserSolution);
 app.use('/api/hidden',hiddentestRoutes);
 app.use('/api/run',runCodeRoutes);
+app.use('/api/submit',submissionRoutes);
 const PORT=process.env.PORT || 3000;
 app.listen(PORT,()=>{
   console.log(`Server is listening to http://localhost:${PORT}`)
