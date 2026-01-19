@@ -28,7 +28,7 @@ mongoose.connect(process.env.MONGO_URL!)
     .catch(err => console.log(err));
 
 app.use("/api/all",userRouter);
-app.use('/api/question',addQuestion);
+app.use('/api/question',addQuestion); 
 app.use('/api/hidden',hiddentestRoutes);
 app.use('/api/run',runCodeRoutes);
 app.use('/api/submit',submissionRoutes);
